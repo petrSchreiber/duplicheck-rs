@@ -1,6 +1,7 @@
 use crate::scanner::FileMD5Info;
+use std::io;
+use std::io::Write;
 use std::path::PathBuf;
-
 use structopt::StructOpt;
 
 mod scanner;
@@ -22,11 +23,27 @@ fn main() {
     let mut directory_path = PathBuf::new();
     directory_path.push(command_line_params.directory);
 
-    let all_files = scanner::enumerate_files_in_dir(directory_path);
-    let file_size_pairs = scanner::files_to_file_size_info(all_files);
-    let mut file_md5_pairs = scanner::file_size_info_to_file_md5_info(&file_size_pairs);
+    let mut stdout = io::stdout();
 
+    print!("Listing files...");
+    stdout.flush().unwrap();
+    let all_files = scanner::enumerate_files_in_dir(directory_path);
+    println!("DONE, found {} files", all_files.len());
+
+    print!("Checking sizes...");
+    stdout.flush().unwrap();
+    let file_size_pairs = scanner::files_to_file_size_info(all_files);
+    println!("DONE");
+
+    print!("Listing MD5...");
+    stdout.flush().unwrap();
+    let mut file_md5_pairs = scanner::file_size_info_to_file_md5_info(&file_size_pairs);
+    println!("DONE");
+
+    println!("Analysing duplicates...");
+    stdout.flush().unwrap();
     list_duplicate_files(&mut file_md5_pairs);
+    println!("FINISHED");
 }
 
 fn list_duplicate_files(file_md5_info: &mut [scanner::FileMD5Info]) {
@@ -35,6 +52,7 @@ fn list_duplicate_files(file_md5_info: &mut [scanner::FileMD5Info]) {
 
     // Creating peekable iterator
     let mut file_iter = file_md5_info.iter().peekable();
+    let mut stdout = io::stdout();
 
     while let Some(&item) = file_iter.peek() {
         file_iter.next();
@@ -59,6 +77,7 @@ fn list_duplicate_files(file_md5_info: &mut [scanner::FileMD5Info]) {
             }
 
             println!();
+            stdout.flush().unwrap();
         }
     }
 }
