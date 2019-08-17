@@ -22,9 +22,10 @@ fn main() {
     directory_path.push(command_line_params.directory);
 
     let all_files = scanner::enumerate_files_in_dir(directory_path);
-    let file_size_pairs = scanner::files_to_file_size_tuples(all_files);
+    let file_size_pairs = scanner::files_to_file_size_info(all_files);
+    let file_md5_pairs = scanner::file_size_info_to_file_md5_info(&file_size_pairs);
 
-    for item in file_size_pairs {
-        println!("{:?}: {}", item.0, item.1);
+    for item in file_md5_pairs {
+        println!("{:?}: {:?}", item.path, item.md5);
     }
 }
