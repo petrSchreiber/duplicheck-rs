@@ -23,3 +23,17 @@ pub fn enumerate_files_in_dir(directory: PathBuf) -> Vec<PathBuf> {
 
     result
 }
+
+pub fn files_to_file_size_tuples(files: Vec<PathBuf>) -> Vec<(PathBuf, u64)> {
+    let mut tuples: Vec<(PathBuf, u64)> = vec![];
+
+    for file in &files {
+        let file_size = fs::metadata(file);
+
+        if file_size.is_ok() {
+            tuples.push((file.to_path_buf(), fs::metadata(file).unwrap().len()));
+        }
+    }
+
+    tuples
+}

@@ -21,9 +21,10 @@ fn main() {
     let mut directory_path = PathBuf::new();
     directory_path.push(command_line_params.directory);
 
-    let result = scanner::enumerate_files_in_dir(directory_path);
+    let all_files = scanner::enumerate_files_in_dir(directory_path);
+    let file_size_pairs = scanner::files_to_file_size_tuples(all_files);
 
-    for item in result {
-        println!("{:?}", item);
+    for item in file_size_pairs {
+        println!("{:?}: {}", item.0, item.1);
     }
 }
